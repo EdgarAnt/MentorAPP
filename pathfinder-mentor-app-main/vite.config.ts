@@ -19,4 +19,19 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  assetsInclude: ['**/*.pl'],
+  publicDir: 'public',
+  build: {
+    assetsInlineLimit: 0,
+    commonjsOptions: {
+      include: [/tau-prolog/, /node_modules/],
+      transformMixedEsModules: true
+    },
+  },
+  optimizeDeps: {
+    include: ['tau-prolog'],
+    esbuildOptions: {
+      target: 'esnext'
+    }
+  },
 }));

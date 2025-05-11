@@ -3,12 +3,14 @@ import MentorCharacter from './MentorCharacter';
 import QuestionScreen from './QuestionScreen';
 import { toast } from '@/components/ui/use-toast';
 import { questions } from '@/data/questions.tsx';
+import { runPrologConsult } from '../hooks/interpreterProlog';
 
 const PathfinderApp: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [mentorExpression, setMentorExpression] = useState<'neutral' | 'happy' | 'thinking' | 'excited'>('neutral');
   const [answers, setAnswers] = useState<{questionId: number, optionId: string}[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [carreraMasAfin, setCarreraMasAfin] = useState<string | null>(null);
 
   useEffect(() => {
     // Mentor expressions based on question progress
@@ -21,40 +23,57 @@ const PathfinderApp: React.FC = () => {
     }
   }, [currentQuestionIndex]);
 
-  const handleSelectOption = (questionId: number, optionId: string) => {
+  const handleSelectOption = async (questionId: number, optionId: string) => {
+    console.log('Seleccionada opción:', { questionId, optionId });
+    
     const newAnswers = [...answers, { questionId, optionId }];
     setAnswers(newAnswers);
     
-    // Generar el formato Prolog para esta respuesta
-    const prologFormat = `P${questionId}(${optionId})`;
-    console.log('Respuesta en formato Prolog:', prologFormat);
-    
-    // Preparar el JSON para Tau Prolog
-    const prologData = {
-      question: questionId,
-      answer: optionId,
-      prologFormat: prologFormat
-    };
-    console.log('Datos para Tau Prolog:', prologData);
-    
     if (currentQuestionIndex < questions.length - 1) {
-      // Move to next question
       setTimeout(() => {
         setCurrentQuestionIndex(prev => prev + 1);
       }, 500);
     } else {
-      // Complete the questionnaire
       setIsComplete(true);
       
-      // Generar el array completo de respuestas en formato Prolog
-      const allAnswers = newAnswers.map(a => `P${a.questionId}(${a.optionId})`);
-      console.log('Todas las respuestas en formato Prolog:', allAnswers);
-      
-      toast({
-        title: "¡Evaluación completada!",
-        description: "Hemos analizado tus respuestas y pronto te mostraremos resultados personalizados.",
-        duration: 5000,
-      });
+      try {
+        // Construir la consulta Prolog
+        const prologQuery = `
+          inicializar_puntajes,
+          ${newAnswers.map(a => `procesar_respuesta(${a.questionId}, '${a.optionId}'),`).join('\n')}
+          carrera_mas_afin(Carrera).
+        `;
+
+        console.log('Query Prolog:', prologQuery);
+
+        const result = await runPrologConsult(prologQuery);
+        console.log('Resultado Prolog:', result);
+        
+        if (result) {
+          // Extraer el nombre de la carrera del resultado
+          const carreraMatch = result.match(/Carrera = ([a-z_]+)/);
+          if (carreraMatch) {
+            const carrera = carreraMatch[1].replace(/_/g, ' ');
+            setCarreraMasAfin(carrera);
+            toast({
+              title: "¡Evaluación completada!",
+              description: `Basado en tus respuestas, la carrera más afín para ti es: ${carrera}`,
+              duration: 5000,
+            });
+          } else {
+            throw new Error('Formato de resultado inválido');
+          }
+        } else {
+          throw new Error('No se pudo determinar la carrera');
+        }
+      } catch (error) {
+        console.error('Error al procesar respuestas:', error);
+        toast({
+          title: "Error",
+          description: "Hubo un error al procesar tus respuestas. Por favor, intenta de nuevo.",
+          duration: 5000,
+        });
+      }
     }
   };
 
@@ -80,57 +99,31 @@ const PathfinderApp: React.FC = () => {
           ) : (
             <div className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 max-w-3xl animate-fade-in">
               <h2 className="text-2xl font-bold text-mentor-primary mb-4">¡Análisis completado!</h2>
-              <p className="text-gray-700 mb-6">
-                Basado en tus respuestas, podríamos recomendar carreras en los siguientes campos:
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Sample results - in a real app these would be calculated based on answers */}
-                <div className="bg-mentor-light p-4 rounded-xl">
-                  <h3 className="font-bold text-mentor-primary">Ingeniería y Tecnología</h3>
-                  <p className="text-sm text-gray-700 mt-1">Compatibilidad: 85%</p>
+              {carreraMasAfin ? (
+                <div className="text-center">
+                  <p className="text-gray-700 mb-6">
+                    Basado en tus respuestas, la carrera más afín para ti es:
+                  </p>
+                  <h3 className="text-3xl font-bold text-mentor-primary mb-4">{carreraMasAfin}</h3>
                 </div>
-                <div className="bg-mentor-light p-4 rounded-xl">
-                  <h3 className="font-bold text-mentor-primary">Diseño y Artes Creativas</h3>
-                  <p className="text-sm text-gray-700 mt-1">Compatibilidad: 70%</p>
-                </div>
-                <div className="bg-mentor-light p-4 rounded-xl">
-                  <h3 className="font-bold text-mentor-primary">Ciencias de la Educación</h3>
-                  <p className="text-sm text-gray-700 mt-1">Compatibilidad: 65%</p>
-                </div>
-                <div className="bg-mentor-light p-4 rounded-xl">
-                  <h3 className="font-bold text-mentor-primary">Ciencias Ambientales</h3>
-                  <p className="text-sm text-gray-700 mt-1">Compatibilidad: 60%</p>
-                </div>
-              </div>
+              ) : (
+                <p className="text-gray-700 mb-6">
+                  Procesando tus respuestas...
+                </p>
+              )}
 
-              {/* Botón temporal para ver JSON */}
-              <div className="mt-8 space-y-4">
-                <button 
-                  className="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl font-medium hover:bg-gray-300 transition-colors mx-auto block"
-                  onClick={() => {
-                    const allAnswers = answers.map(a => `P${a.questionId}(${a.optionId})`);
-                    const jsonData = {
-                      answers: allAnswers,
-                      rawData: answers
-                    };
-                    alert(JSON.stringify(jsonData, null, 2));
-                  }}
-                >
-                  Ver JSON Generado
-                </button>
-
-                <button 
-                  className="bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block"
-                  onClick={() => {
-                    setCurrentQuestionIndex(0);
-                    setAnswers([]);
-                    setIsComplete(false);
-                    setMentorExpression('happy');
-                  }}
-                >
-                  Comenzar de nuevo
-                </button>
-              </div>
+              <button 
+                className="bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block"
+                onClick={() => {
+                  setCurrentQuestionIndex(0);
+                  setAnswers([]);
+                  setIsComplete(false);
+                  setCarreraMasAfin(null);
+                  setMentorExpression('happy');
+                }}
+              >
+                Comenzar de nuevo
+              </button>
             </div>
           )}
         </div>

@@ -1,5 +1,13 @@
-% filepath: c:\Users\MikeyGp1\Documents\Prolog\VocationalExpert.pl
-:- dynamic puntaje/2.
+// Usar la versión global de tau-prolog
+declare const pl: any;
+
+// Código Prolog directamente en el archivo
+const prologCode = `
+% Define max_list/2 to find the maximum element in a list
+max_list([X], X).
+max_list([H|T], Max) :-
+    max_list(T, TailMax),
+    Max is max(H, TailMax).
 
 % Inicializar puntajes para las carreras
 inicializar_puntajes :-
@@ -16,7 +24,7 @@ inicializar_puntajes :-
     assertz(puntaje(medicina, 0)),
     assertz(puntaje(ing_mecanica, 0)).
 
-% Preguntas y asignación de puntajes
+% Reglas para las preguntas
 pregunta(1, a, matematicas, 54).
 pregunta(1, b, biologia, 55).
 pregunta(1, b, medicina, 54).
@@ -642,10 +650,44 @@ carrera_mas_afin(Carrera) :-
     findall(P, puntaje(_, P), Puntajes),
     max_list(Puntajes, MaxPuntaje),
     puntaje(Carrera, MaxPuntaje).
+`;
 
-% Ejemplo de flujo
-% ejecutar :-
-%    inicializar_puntajes,
-%    procesar_respuesta(1, a),
-%    carrera_mas_afin(Carrera),
-%    format('La carrera más afín para ti es: ~w', [Carrera]).
+// Function to run Prolog consult with promises
+export async function runPrologConsult(goal: string): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+        try {
+            const session = pl.create(1000);
+            session.consult(prologCode, {
+                success: function() {
+                    console.log('Código Prolog consultado exitosamente');
+                    session.query(goal, {
+                        success: function() {
+                            console.log('Query ejecutada:', goal);
+                            session.answers(function(answer) {
+                                if (answer) {
+                                    const result = session.format_answer(answer);
+                                    console.log('Resultado Prolog:', result);
+                                    resolve(result);
+                                } else {
+                                    console.log('No se encontraron respuestas');
+                                    resolve(null);
+                                }
+                            });
+                        },
+                        error: function(err) {
+                            console.error('Error en query Prolog:', err);
+                            reject(err);
+                        }
+                    });
+                },
+                error: function(err) {
+                    console.error('Error al cargar código Prolog:', err);
+                    reject(err);
+                }
+            });
+        } catch (error) {
+            console.error('Error al ejecutar consulta Prolog:', error);
+            reject(error);
+        }
+    });
+}
