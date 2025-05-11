@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import ChatBubble from './ChatBubble';
 import OptionButton from './OptionButton';
 
-interface Question {
-  id: number;
-  text: string;
-  options: string[];
-}
-
 interface QuestionScreenProps {
-  question: Question;
-  onSelectOption: (questionId: number, optionIndex: number) => void;
+  question: {
+    id: number;
+    text: React.ReactNode;
+    options: Array<{
+      id: string;
+      text: string;
+    }>;
+  };
+  onSelectOption: (questionId: number, optionId: string) => void;
   isLastQuestion: boolean;
 }
 
@@ -20,7 +21,7 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
   isLastQuestion
 }) => {
   const [typing, setTyping] = useState(true);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showOptions, setShowOptions] = useState(false);
 
   useEffect(() => {
@@ -44,12 +45,12 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
     return () => clearTimeout(typingTimer);
   }, [question]);
 
-  const handleOptionClick = (optionIndex: number) => {
-    setSelectedOption(optionIndex);
+  const handleOptionClick = (optionId: string) => {
+    setSelectedOption(optionId);
     
     // Delay moving to next question for animation effect
     setTimeout(() => {
-      onSelectOption(question.id, optionIndex);
+      onSelectOption(question.id, optionId);
     }, 800);
   };
 
@@ -62,14 +63,14 @@ const QuestionScreen: React.FC<QuestionScreenProps> = ({
       
       {showOptions && (
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4 justify-center">
-          {question.options.map((option, index) => (
+          {question.options.map((option) => (
             <OptionButton
-              key={index}
-              label={option}
-              onClick={() => handleOptionClick(index)}
-              selected={selectedOption === index}
+              key={option.id}
+              label={option.text}
+              onClick={() => handleOptionClick(option.id)}
+              selected={selectedOption === option.id}
               disabled={selectedOption !== null}
-              animationDelay={`${index * 0.1}s`}
+              animationDelay={`${question.options.indexOf(option) * 0.1}s`}
             />
           ))}
         </div>

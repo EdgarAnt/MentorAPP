@@ -2,77 +2,12 @@ import React, { useState, useEffect } from 'react';
 import MentorCharacter from './MentorCharacter';
 import QuestionScreen from './QuestionScreen';
 import { toast } from '@/components/ui/use-toast';
-
-// Dummy questions data
-const questions = [
-  {
-    id: 1,
-    text: "¡Hola! Soy tu guía para descubrir tu carrera ideal. Para empezar, ¿qué te gusta más hacer en tu tiempo libre?",
-    options: [
-      "Resolver problemas matemáticos",
-      "Crear arte o diseñar",
-      "Ayudar a otras personas",
-      "Explorar la naturaleza",
-      "Leer o escribir",
-      "Programar o usar tecnología"
-    ]
-  },
-  {
-    id: 2,
-    text: "¡Interesante elección! Ahora dime, ¿qué materia escolar disfrutas más?",
-    options: [
-      "Matemáticas",
-      "Arte o Música",
-      "Ciencias Sociales",
-      "Educación Física",
-      "Literatura o Idiomas",
-      "Informática o Tecnología",
-      "Ciencias Naturales",
-      "Historia"
-    ]
-  },
-  {
-    id: 3,
-    text: "¿Cómo te ves trabajando en el futuro?",
-    options: [
-      "En una oficina con computadoras",
-      "En espacios creativos",
-      "Ayudando directamente a personas",
-      "Al aire libre",
-      "Investigando en un laboratorio",
-      "Enseñando a otros"
-    ]
-  },
-  {
-    id: 4,
-    text: "¿Qué habilidad crees que es tu mayor fortaleza?",
-    options: [
-      "Análisis y lógica",
-      "Creatividad e imaginación",
-      "Comunicación y empatía",
-      "Organización y planificación",
-      "Investigación y curiosidad",
-      "Liderazgo y trabajo en equipo"
-    ]
-  },
-  {
-    id: 5,
-    text: "Y por último, ¿qué valor es más importante para ti en tu futura carrera?",
-    options: [
-      "Innovación",
-      "Expresión personal",
-      "Ayudar a otros",
-      "Estabilidad económica",
-      "Reconocimiento",
-      "Equilibrio vida-trabajo"
-    ]
-  }
-];
+import { questions } from '@/data/questions.tsx';
 
 const PathfinderApp: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [mentorExpression, setMentorExpression] = useState<'neutral' | 'happy' | 'thinking' | 'excited'>('neutral');
-  const [answers, setAnswers] = useState<{questionId: number, optionIndex: number}[]>([]);
+  const [answers, setAnswers] = useState<{questionId: number, optionId: string}[]>([]);
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
@@ -86,9 +21,21 @@ const PathfinderApp: React.FC = () => {
     }
   }, [currentQuestionIndex]);
 
-  const handleSelectOption = (questionId: number, optionIndex: number) => {
-    const newAnswers = [...answers, { questionId, optionIndex }];
+  const handleSelectOption = (questionId: number, optionId: string) => {
+    const newAnswers = [...answers, { questionId, optionId }];
     setAnswers(newAnswers);
+    
+    // Generar el formato Prolog para esta respuesta
+    const prologFormat = `P${questionId}(${optionId})`;
+    console.log('Respuesta en formato Prolog:', prologFormat);
+    
+    // Preparar el JSON para Tau Prolog
+    const prologData = {
+      question: questionId,
+      answer: optionId,
+      prologFormat: prologFormat
+    };
+    console.log('Datos para Tau Prolog:', prologData);
     
     if (currentQuestionIndex < questions.length - 1) {
       // Move to next question
@@ -98,6 +45,10 @@ const PathfinderApp: React.FC = () => {
     } else {
       // Complete the questionnaire
       setIsComplete(true);
+      
+      // Generar el array completo de respuestas en formato Prolog
+      const allAnswers = newAnswers.map(a => `P${a.questionId}(${a.optionId})`);
+      console.log('Todas las respuestas en formato Prolog:', allAnswers);
       
       toast({
         title: "¡Evaluación completada!",
@@ -110,15 +61,14 @@ const PathfinderApp: React.FC = () => {
   return (
     <div className="app-background">
       <div className="container px-4 py-8 md:py-12 min-h-screen">
-        <header className="w-full mx-auto flex flex-col items-center text-center mb-8 pl-72">
+        <header className="w-full mx-auto flex flex-col items-center text-center mb-8 ">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Pathfinder Mentor</h1>
           <p className="text-lg text-gray-600">Descubre tu carrera ideal a través de preguntas simples</p>
         </header>
         
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-12">
           <MentorCharacter 
-            expression={mentorExpression} 
-            className="w-40 md:w-60"
+            className=""
           />
           
           {!isComplete ? (
@@ -152,22 +102,40 @@ const PathfinderApp: React.FC = () => {
                   <p className="text-sm text-gray-700 mt-1">Compatibilidad: 60%</p>
                 </div>
               </div>
-              <button 
-                className="mt-8 bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block"
-                onClick={() => {
-                  setCurrentQuestionIndex(0);
-                  setAnswers([]);
-                  setIsComplete(false);
-                  setMentorExpression('happy');
-                }}
-              >
-                Comenzar de nuevo
-              </button>
+
+              {/* Botón temporal para ver JSON */}
+              <div className="mt-8 space-y-4">
+                <button 
+                  className="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl font-medium hover:bg-gray-300 transition-colors mx-auto block"
+                  onClick={() => {
+                    const allAnswers = answers.map(a => `P${a.questionId}(${a.optionId})`);
+                    const jsonData = {
+                      answers: allAnswers,
+                      rawData: answers
+                    };
+                    alert(JSON.stringify(jsonData, null, 2));
+                  }}
+                >
+                  Ver JSON Generado
+                </button>
+
+                <button 
+                  className="bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block"
+                  onClick={() => {
+                    setCurrentQuestionIndex(0);
+                    setAnswers([]);
+                    setIsComplete(false);
+                    setMentorExpression('happy');
+                  }}
+                >
+                  Comenzar de nuevo
+                </button>
+              </div>
             </div>
           )}
         </div>
         
-        <footer className="text-center text-gray-500 text-sm mt-20 mb-4 pl-72">
+        <footer className="text-center text-gray-500 text-sm mt-60 mb-4">
           <p>Pathfinder Mentor - Una herramienta educativa para orientación vocacional</p>
         </footer>
       </div>
