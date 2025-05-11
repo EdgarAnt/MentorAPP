@@ -1,25 +1,32 @@
 // Import Tau Prolog core and create a session
 const pl = require("tau-prolog");
 const session = pl.create(1000);
-const show = x => console.log(session.format_answer(x));
 
-// Get Node.js argument: node ./script.js item
-const item = process.argv[2];
-
-// Change the goal to a string you want to know
-const goal = `
-    inicializar_puntajes,
-    procesar_respuesta(1,b),
-    carrera_mas_afin(Carrera).
-`;
-
-// Consult program, query goal, and show answers
-session.consult("VocationalExpert.pl", {
-    success: function() {
-        session.query(goal, {
+// Function to run Prolog consult with promises
+function runPrologConsult(goal) {
+    return new Promise((resolve, reject) => {
+        session.consult("VocationalExpert.pl", {
             success: function() {
-                session.answers(show);
+                session.query(goal, {
+                    success: function() {
+                        session.answers(function(answer) {
+                            if (answer) {
+                                resolve(session.format_answer(answer));
+                            } else {
+                                resolve(null);
+                            }
+                        });
+                    },
+                    error: function(err) {
+                        reject(err);
+                    }
+                });
+            },
+            error: function(err) {
+                reject(err);
             }
-        })
-    }
-});
+        });
+    });
+}
+
+module.exports = { runPrologConsult };
