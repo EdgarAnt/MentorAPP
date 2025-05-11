@@ -6,14 +6,13 @@ const show = x => console.log(session.format_answer(x));
 // Get Node.js argument: node ./script.js item
 const item = process.argv[2];
 
+// Change the goal to a string you want to know
 const goal = `
-    inicializar_puntajes,
-    procesar_respuestas(1,b),
-    carrera_mas_afin(Carrera).
+    pregunta(1, a, matematicas, 54).
 `;
 
 // Consult program, query goal, and show answers
-session.consult("TrafficControl.pl", {
+session.consult("VocationalExpert.pl", {
     success: function() {
         session.query(goal, {
             success: function() {
