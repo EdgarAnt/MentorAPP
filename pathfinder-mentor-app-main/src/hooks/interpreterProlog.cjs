@@ -8,7 +8,9 @@ const item = process.argv[2];
 
 // Change the goal to a string you want to know
 const goal = `
-    pregunta(1, a, matematicas, 54).
+    inicializar_puntajes,
+    procesar_respuesta(1,b),
+    carrera_mas_afin(Carrera).
 `;
 
 // Consult program, query goal, and show answers

@@ -1,4 +1,8 @@
-mama(3).
+% Define max_list/2 to find the maximum element in a list
+max_list([X], X).
+max_list([H|T], Max) :-
+    max_list(T, TailMax),
+    Max is max(H, TailMax).
 
 % Inicializar puntajes para las carreras
 inicializar_puntajes :-
