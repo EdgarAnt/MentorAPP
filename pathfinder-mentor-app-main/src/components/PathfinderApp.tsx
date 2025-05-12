@@ -4,6 +4,7 @@ import QuestionScreen from './QuestionScreen';
 import { toast } from '@/components/ui/use-toast';
 import { questions as defaultQuestions } from '@/data/questions.tsx';
 import { runPrologConsult } from '../hooks/interpreterProlog';
+import { useNavigate } from 'react-router-dom';
 
 interface PathfinderAppProps {
   questionCount?: number;
@@ -16,6 +17,7 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
   const [answers, setAnswers] = useState<{questionId: number, optionId: string}[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [carreraMasAfin, setCarreraMasAfin] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Usar solo las preguntas necesarias
   const questionsToShow = questions
@@ -91,7 +93,18 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
   console.log('currentQuestionIndex:', currentQuestionIndex);
 
   return (
-    <div className="app-background">
+    <div className="min-h-screen" style={{ backgroundColor: '#F1F1FD' }}>
+      {/* Flecha atrás */}
+      <button
+        className="absolute top-4 left-4 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-white shadow hover:bg-gray-100 transition-colors"
+        onClick={() => navigate('/')}
+        aria-label="Volver al inicio"
+        type="button"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7 text-mentor-primary">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
       <div className="container px-4 py-8 md:py-12 min-h-screen">
         <header className="w-full mx-auto flex flex-col items-center text-center mb-8 ">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Leo Mentor</h1>
