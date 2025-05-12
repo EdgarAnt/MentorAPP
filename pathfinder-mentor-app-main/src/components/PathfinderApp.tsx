@@ -2,26 +2,36 @@ import React, { useState, useEffect } from 'react';
 import MentorCharacter from './MentorCharacter';
 import QuestionScreen from './QuestionScreen';
 import { toast } from '@/components/ui/use-toast';
-import { questions } from '@/data/questions.tsx';
+import { questions as defaultQuestions } from '@/data/questions.tsx';
 import { runPrologConsult } from '../hooks/interpreterProlog';
 
-const PathfinderApp: React.FC = () => {
+interface PathfinderAppProps {
+  questionCount?: number;
+  questions?: typeof defaultQuestions;
+}
+
+const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [mentorExpression, setMentorExpression] = useState<'neutral' | 'happy' | 'thinking' | 'excited'>('neutral');
   const [answers, setAnswers] = useState<{questionId: number, optionId: string}[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [carreraMasAfin, setCarreraMasAfin] = useState<string | null>(null);
 
+  // Usar solo las preguntas necesarias
+  const questionsToShow = questions
+    ? questions
+    : (questionCount ? defaultQuestions.slice(0, questionCount) : defaultQuestions);
+
   useEffect(() => {
     // Mentor expressions based on question progress
     if (currentQuestionIndex === 0) {
       setMentorExpression('happy');
-    } else if (currentQuestionIndex === questions.length - 1) {
+    } else if (currentQuestionIndex === questionsToShow.length - 1) {
       setMentorExpression('excited');
     } else {
       setMentorExpression(currentQuestionIndex % 2 === 0 ? 'neutral' : 'thinking');
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, questionsToShow.length]);
 
   const handleSelectOption = async (questionId: number, optionId: string) => {
     console.log('Seleccionada opción:', { questionId, optionId });
@@ -29,7 +39,7 @@ const PathfinderApp: React.FC = () => {
     const newAnswers = [...answers, { questionId, optionId }];
     setAnswers(newAnswers);
     
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < questionsToShow.length - 1) {
       setTimeout(() => {
         setCurrentQuestionIndex(prev => prev + 1);
       }, 500);
@@ -77,6 +87,9 @@ const PathfinderApp: React.FC = () => {
     }
   };
 
+  console.log('questionsToShow:', questionsToShow);
+  console.log('currentQuestionIndex:', currentQuestionIndex);
+
   return (
     <div className="app-background">
       <div className="container px-4 py-8 md:py-12 min-h-screen">
@@ -91,11 +104,15 @@ const PathfinderApp: React.FC = () => {
           />
           
           {!isComplete ? (
-            <QuestionScreen 
-              question={questions[currentQuestionIndex]}
-              onSelectOption={handleSelectOption}
-              isLastQuestion={currentQuestionIndex === questions.length - 1}
-            />
+            questionsToShow[currentQuestionIndex] ? (
+              <QuestionScreen 
+                question={questionsToShow[currentQuestionIndex]}
+                onSelectOption={handleSelectOption}
+                isLastQuestion={currentQuestionIndex === questionsToShow.length - 1}
+              />
+            ) : (
+              <div className="text-red-500 font-bold text-center">No hay preguntas para mostrar.</div>
+            )
           ) : (
             <div className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 max-w-3xl animate-fade-in">
               <h2 className="text-2xl font-bold text-mentor-primary mb-4">¡Análisis completado!</h2>

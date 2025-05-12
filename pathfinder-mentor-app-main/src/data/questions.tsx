@@ -628,3 +628,5 @@ export const questions: Question[] = [
   }
 
 ];
+
+export const quickQuestions = questions.slice(0, 10);
