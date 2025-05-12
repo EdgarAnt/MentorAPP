@@ -5,6 +5,7 @@ import { toast } from '@/components/ui/use-toast';
 import { questions as defaultQuestions } from '@/data/questions.tsx';
 import { runPrologConsult } from '../hooks/interpreterProlog';
 import { useNavigate } from 'react-router-dom';
+import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 
 interface PathfinderAppProps {
   questionCount?: number;
@@ -17,6 +18,7 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
   const [answers, setAnswers] = useState<{questionId: number, optionId: string}[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [carreraMasAfin, setCarreraMasAfin] = useState<string | null>(null);
+  const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
 
   // Usar solo las preguntas necesarias
@@ -92,6 +94,20 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
   console.log('questionsToShow:', questionsToShow);
   console.log('currentQuestionIndex:', currentQuestionIndex);
 
+  const pdfLinks: Record<string, string> = {
+    matematicas: 'https://www.cucei.udg.mx/carreras/matematicas/sites/default/files/adjuntos/mapa_curricular_lima_2023b.pdf',
+    biologia: 'http://www.pregrado.udg.mx/sites/default/files/planesEstudio/plan_de_estudios_2017_0.pdf',
+    fisica: 'https://www.cucei.udg.mx/carreras/fisica/sites/default/files/malla_fisica_oct_19.pdf',
+    computacion: 'https://www.cucei.udg.mx/carreras/computacion/es/malla-curricular-icom-2021',
+    'ing biomedica': 'https://www.cucei.udg.mx/carreras/biomedica/sites/default/files/malla_biomedica_2020.pdf',
+    'ing electronica': 'https://www.cucei.udg.mx/carreras/electronica/sites/default/files/adjuntos/malla_ing_junio2016.pdf',
+    'ing industrial': 'https://www.cucei.udg.mx/carreras/industrial/sites/default/files/adjuntos/malla_2018a.pdf',
+    historia: 'http://www.pregrado.udg.mx/sites/default/files/planesEstudio/trayectoria_curricular_de_la_licenciatura_en_historia.pdf',
+    'arte y diseño': 'https://cuaad.udg.mx/sites/default/files/plan_de_estudios_dati_idml.pdf',
+    medicina: 'http://pregrado.udg.mx/Centros/Tem%C3%A1ticos/CUCS/licenciatura-en-medico-cirujano-y-partero/unidades-aprendizaje',
+    'mecanica electrica': 'https://www.cucei.udg.mx/sites/default/files/ing_mecanica.pdf',
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F1F1FD' }}>
       {/* Flecha atrás */}
@@ -115,56 +131,80 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
           <MentorCharacter 
             className=""
           />
-          
-          {!isComplete ? (
-            questionsToShow[currentQuestionIndex] ? (
-              <QuestionScreen 
-                question={questionsToShow[currentQuestionIndex]}
-                onSelectOption={handleSelectOption}
-                isLastQuestion={currentQuestionIndex === questionsToShow.length - 1}
-              />
-            ) : (
-              <div className="text-red-500 font-bold text-center">No hay preguntas para mostrar.</div>
-            )
-          ) : (
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 max-w-3xl animate-fade-in mb-6">
-              <h2 className="text-2xl font-bold text-mentor-primary mb-4">¡Análisis completado!</h2>
-              {carreraMasAfin ? (
-                <div className="text-center">
-                  <p className="text-gray-700 mb-6">
-                    Basado en tus respuestas, la carrera más afín para ti es:
-                  </p>
-                  <h3 className="text-3xl font-bold text-mentor-primary mb-4">{carreraMasAfin}</h3>
-                </div>
+          <div className="flex flex-col items-center">
+            {/* Cuadro blanco de resultados */}
+            {!isComplete ? (
+              questionsToShow[currentQuestionIndex] ? (
+                <QuestionScreen 
+                  question={questionsToShow[currentQuestionIndex]}
+                  onSelectOption={handleSelectOption}
+                  isLastQuestion={currentQuestionIndex === questionsToShow.length - 1}
+                />
               ) : (
-                <p className="text-gray-700 mb-6">
-                  Procesando tus respuestas...
-                </p>
-              )}
+                <div className="text-red-500 font-bold text-center">No hay preguntas para mostrar.</div>
+              )
+            ) : (
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 max-w-3xl animate-fade-in mb-6">
+                <h2 className="text-2xl font-bold text-mentor-primary mb-4">¡Análisis completado!</h2>
+                {carreraMasAfin ? (
+                  <div className="text-center">
+                    <p className="text-gray-700 mb-6">
+                      Basado en tus respuestas, la carrera más afín para ti es:
+                    </p>
+                    <h3 className="text-3xl font-bold text-mentor-primary mb-4">{carreraMasAfin}</h3>
+                  </div>
+                ) : (
+                  <p className="text-gray-700 mb-6">
+                    Procesando tus respuestas...
+                  </p>
+                )}
 
-              <button 
-                className="bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block mb-6"
-                onClick={() => {
-                  setCurrentQuestionIndex(0);
-                  setAnswers([]);
-                  setIsComplete(false);
-                  setCarreraMasAfin(null);
-                  setMentorExpression('happy');
-                }}
-              >
-                Comenzar de nuevo
-              </button>
-              {/* Botones adicionales dentro del cuadro de resultados */}
-              <div className="flex justify-center gap-8 mt-2">
-                <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
-                  Plan de estudios
-                </button>
-                <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
-                  Más Detalles
+                <button 
+                  className="bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block mb-6"
+                  onClick={() => {
+                    setCurrentQuestionIndex(0);
+                    setAnswers([]);
+                    setIsComplete(false);
+                    setCarreraMasAfin(null);
+                    setMentorExpression('happy');
+                  }}
+                >
+                  Comenzar de nuevo
                 </button>
               </div>
-            </div>
-          )}
+            )}
+            {/* Botones debajo del cuadro blanco */}
+            {isComplete && (
+              <>
+                <div className="flex justify-center gap-8 mt-0 mb-4 animate-fade-in">
+                  <button
+                    className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors"
+                    onClick={() => setOpenModal(true)}
+                  >
+                    Plan de estudios
+                  </button>
+                  <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
+                    Más Detalles
+                  </button>
+                </div>
+                {/* Modal para mostrar el PDF */}
+                <Dialog open={openModal} onOpenChange={setOpenModal}>
+                  <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col">
+                    <DialogTitle>Malla curricular de {carreraMasAfin}</DialogTitle>
+                    {carreraMasAfin && pdfLinks[carreraMasAfin.toLowerCase()] ? (
+                      <iframe
+                        src={pdfLinks[carreraMasAfin.toLowerCase()]}
+                        title={`Malla curricular de ${carreraMasAfin}`}
+                        className="w-full h-full rounded-lg border"
+                      />
+                    ) : (
+                      <div className="text-center text-red-500 py-8">No hay malla curricular disponible para esta carrera.</div>
+                    )}
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          </div>
         </div>
         
         <footer className="text-center text-gray-500 text-sm mt-30 mb-4">
