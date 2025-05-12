@@ -659,34 +659,27 @@ export async function runPrologConsult(goal: string): Promise<string | null> {
             const session = pl.create(1000);
             session.consult(prologCode, {
                 success: function() {
-                    console.log('Código Prolog consultado exitosamente');
                     session.query(goal, {
                         success: function() {
-                            console.log('Query ejecutada:', goal);
+                            let resolved = false;
                             session.answers(function(answer) {
-                                if (answer) {
+                                if (!resolved && answer) {
+                                    resolved = true;
                                     const result = session.format_answer(answer);
-                                    console.log('Resultado Prolog:', result);
                                     resolve(result);
-                                } else {
-                                    console.log('No se encontraron respuestas');
-                                    resolve(null);
                                 }
                             });
                         },
                         error: function(err) {
-                            console.error('Error en query Prolog:', err);
                             reject(err);
                         }
                     });
                 },
                 error: function(err) {
-                    console.error('Error al cargar código Prolog:', err);
                     reject(err);
                 }
             });
         } catch (error) {
-            console.error('Error al ejecutar consulta Prolog:', error);
             reject(error);
         }
     });

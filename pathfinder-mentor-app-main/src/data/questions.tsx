@@ -339,8 +339,7 @@ export const questions: Question[] = [
       { id: 'd', text: "Blog técnico de software" },
       { id: 'e', text: "Revista cultural o literaria" }
     ]
-  }
-  /*
+  },
   {
     id: 31,
     text: "¿Qué aplicación te motiva más crear?",
@@ -627,5 +626,5 @@ export const questions: Question[] = [
       { id: 'e', text: "Técnicas de expresión visual o literaria" }
     ]
   }
-*/
+
 ];
