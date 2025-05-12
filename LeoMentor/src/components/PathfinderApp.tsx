@@ -184,13 +184,26 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
               {/* Modal para mostrar el PDF */}
               <Dialog open={openModal} onOpenChange={setOpenModal}>
                 <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col">
-                  <DialogTitle>Malla curricular de {carreraMasAfin}</DialogTitle>
+                  <DialogTitle className="text-white">Malla curricular de {carreraMasAfin}</DialogTitle>
                   {carreraMasAfin && pdfLinks[carreraMasAfin.toLowerCase()] ? (
-                    <iframe
-                      src={pdfLinks[carreraMasAfin.toLowerCase()]}
-                      title={`Malla curricular de ${carreraMasAfin}`}
-                      className="w-full h-full rounded-lg border"
-                    />
+                    <>
+                      <iframe
+                        src={pdfLinks[carreraMasAfin.toLowerCase()]}
+                        title={`Malla curricular de ${carreraMasAfin}`}
+                        className="w-full h-full rounded-lg border"
+                        allow="fullscreen"
+                      />
+                      <div className="mt-2 text-center">
+                        <a
+                          href={pdfLinks[carreraMasAfin.toLowerCase()]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-mentor-primary underline hover:text-indigo-700"
+                        >
+                          ¿No puedes ver el PDF? Ábrelo en una nueva pestaña
+                        </a>
+                      </div>
+                    </>
                   ) : (
                     <div className="text-center text-red-500 py-8">No hay malla curricular disponible para esta carrera.</div>
                   )}
