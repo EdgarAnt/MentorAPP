@@ -122,8 +122,22 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
     biologia: 'https://cucba.udg.mx/oferta-academica/licenciaturas/licenciatura-en-biologia',
   };
 
+  const gifs: Record<string, string> = {
+    matematicas: '/assets/Gifs/Matematicas_Fisica.gif',
+    biologia: '/assets/Gifs/Biologo_Medidcina_Biomedica.gif',
+    fisica: '/assets/Gifs/Matematicas_Fisica.gif',
+    computacion: '/assets/Gifs/Computacion.gif',
+    ing_biomedica: '/assets/Gifs/Biologo_Medidcina_Biomedica.gif',
+    ing_electronica: '/assets/Gifs/Electronica_Mecanica.gif',
+    ing_industrial: '/assets/Gifs/Ingenieria_Industrial.png',
+    historia_humanidades: '/assets/Gifs/Historia_Humanidades.png',
+    arte_diseno: '/assets/Gifs/Arte_Diseno.gif',
+    medicina: '/assets/Gifs/Biologo_Medidcina_Biomedica.gif',
+    ing_mecanica: '/assets/Gifs/Electronica_Mecanica.gif',
+  };
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F1F1FD' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: isComplete ? '#F6F5FE' : '#F1F1FD' }}>
       {/* Flecha atrás */}
       <button
         className="absolute top-4 left-4 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-white shadow hover:bg-gray-100 transition-colors"
@@ -135,14 +149,26 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </button>
-      <div className="container px-4 py-8 md:py-12 min-h-screen">
+      <div className="container px-4 py-8 md:py-12 flex-1">
         <header className="w-full mx-auto flex flex-col items-center text-center mb-8 ">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Leo Mentor</h1>
           <p className="text-lg text-gray-600">Descubre tu carrera ideal a través de preguntas simples</p>
         </header>
         
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-12">
-          <MentorCharacter className="" />
+          {!isComplete ? (
+            <MentorCharacter className="" />
+          ) : (
+            carreraMasAfin && gifs[carreraMasAfin.toLowerCase().replace(/ /g, '_')] ? (
+              <img
+                src={gifs[carreraMasAfin.toLowerCase().replace(/ /g, '_')]}
+                alt={`Gif de ${carreraMasAfin}`}
+                className="max-h-96"
+              />
+            ) : (
+              <MentorCharacter className="" />
+            )
+          )}
           {!isComplete ? (
             questionsToShow[currentQuestionIndex] ? (
               <QuestionScreen 
@@ -246,11 +272,10 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
             </div>
           )}
         </div>
-        
-        <footer className="text-center text-gray-500 text-sm mt-30 mb-4">
-          <p>Leo Mentor - Una herramienta educativa para orientación vocacional</p>
-        </footer>
       </div>
+      <footer className="text-center text-gray-500 text-sm mt-30 mb-8">
+        <p>Leo Mentor - Una herramienta educativa para orientación vocacional</p>
+      </footer>
     </div>
   );
 };
