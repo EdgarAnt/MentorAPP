@@ -108,6 +108,20 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
     'mecanica electrica': 'https://www.cucei.udg.mx/sites/default/files/ing_mecanica.pdf',
   };
 
+  const detallesLinks: Record<string, string> = {
+    computacion: 'https://www.cucei.udg.mx/es/oferta-academica/licenciaturas/licenciatura-en-ingenieria-en-computacion',
+    matematicas: 'https://www.cucei.udg.mx/es/oferta-academica/licenciaturas/licenciatura-en-matematicas',
+    fisica: 'https://www.cucei.udg.mx/es/oferta-academica/licenciaturas/licenciatura-en-fisica',
+    'ingenieria biomedica': 'https://www.cucei.udg.mx/es/oferta-academica/licenciaturas/licenciatura-en-ingenieria-biomedica',
+    'ing electronica': 'https://www.cucei.udg.mx/es/oferta-academica/licenciaturas/ingenieria-en-electronica-y-sistemas-inteligentes',
+    'ing industrial': 'https://www.cucei.udg.mx/es/oferta-academica/licenciaturas/licenciatura-en-ingenieria-industrial',
+    'historia y humanidades': 'http://www.cucsh.udg.mx/licenciaturas/licenciatura-en-historia',
+    'arte y diseño': 'https://cuaad.udg.mx/?q=presentacion-0',
+    medicina: 'http://pregrado.udg.mx/Centros/Tem%C3%A1ticos/CUCS/licenciatura-en-medico-cirujano-y-partero',
+    'mecanica electronica': 'https://www.cucei.udg.mx/es/oferta-academica/licenciaturas/licenciatura-en-ingenieria-mecanica-electrica',
+    biologia: 'https://cucba.udg.mx/oferta-academica/licenciaturas/licenciatura-en-biologia',
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F1F1FD' }}>
       {/* Flecha atrás */}
@@ -177,7 +191,15 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
                 >
                   Plan de estudios
                 </button>
-                <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
+                <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors"
+                  onClick={() => {
+                    if (carreraMasAfin && detallesLinks[carreraMasAfin.toLowerCase()]) {
+                      window.open(detallesLinks[carreraMasAfin.toLowerCase()], '_blank');
+                    } else {
+                      alert('No hay detalles disponibles para esta carrera.');
+                    }
+                  }}
+                >
                   Más Detalles
                 </button>
               </div>
@@ -186,24 +208,36 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
                 <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col">
                   <DialogTitle className="text-white">Malla curricular de {carreraMasAfin}</DialogTitle>
                   {carreraMasAfin && pdfLinks[carreraMasAfin.toLowerCase()] ? (
-                    <>
-                      <iframe
-                        src={pdfLinks[carreraMasAfin.toLowerCase()]}
-                        title={`Malla curricular de ${carreraMasAfin}`}
-                        className="w-full h-full rounded-lg border"
-                        allow="fullscreen"
-                      />
-                      <div className="mt-2 text-center">
-                        <a
-                          href={pdfLinks[carreraMasAfin.toLowerCase()]}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-mentor-primary underline hover:text-indigo-700"
-                        >
-                          ¿No puedes ver el PDF? Ábrelo en una nueva pestaña
-                        </a>
-                      </div>
-                    </>
+                    (() => {
+                      let url = pdfLinks[carreraMasAfin.toLowerCase()];
+                      const carreraKey = carreraMasAfin.toLowerCase();
+                      if (carreraKey === 'computacion') {
+                        url = '/assets/Carreras/Computacion.pdf';
+                      } else if (carreraKey === 'medicina') {
+                        url = '/assets/Carreras/Medicina.pdf';
+                      }
+                      const isPdf = url.toLowerCase().endsWith('.pdf');
+                      return (
+                        <>
+                          <iframe
+                            src={url}
+                            title={`Malla curricular de ${carreraMasAfin}`}
+                            className="w-full h-full rounded-lg border"
+                            allow="fullscreen"
+                          />
+                          <div className="mt-2 text-center">
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-mentor-primary underline hover:text-indigo-700"
+                            >
+                              ¿No puedes ver {isPdf ? 'el PDF' : 'la página'}? Ábrelo en una nueva pestaña
+                            </a>
+                          </div>
+                        </>
+                      );
+                    })()
                   ) : (
                     <div className="text-center text-red-500 py-8">No hay malla curricular disponible para esta carrera.</div>
                   )}
