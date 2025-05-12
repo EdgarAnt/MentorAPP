@@ -127,7 +127,7 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
               <div className="text-red-500 font-bold text-center">No hay preguntas para mostrar.</div>
             )
           ) : (
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 max-w-3xl animate-fade-in">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 max-w-3xl animate-fade-in mb-6">
               <h2 className="text-2xl font-bold text-mentor-primary mb-4">¡Análisis completado!</h2>
               {carreraMasAfin ? (
                 <div className="text-center">
@@ -143,7 +143,7 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
               )}
 
               <button 
-                className="bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block"
+                className="bg-mentor-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-600 transition-colors mx-auto block mb-6"
                 onClick={() => {
                   setCurrentQuestionIndex(0);
                   setAnswers([]);
@@ -154,6 +154,15 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
               >
                 Comenzar de nuevo
               </button>
+              {/* Botones adicionales dentro del cuadro de resultados */}
+              <div className="flex justify-center gap-8 mt-2">
+                <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
+                  Plan de estudios
+                </button>
+                <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
+                  Más Detalles
+                </button>
+              </div>
             </div>
           )}
         </div>
