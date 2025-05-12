@@ -158,8 +158,8 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
           )}
         </div>
         
-        <footer className="text-center text-gray-500 text-sm mt-60 mb-4">
-          <p>Pathfinder Mentor - Una herramienta educativa para orientación vocacional</p>
+        <footer className="text-center text-gray-500 text-sm mt-30 mb-4">
+          <p>Leo Mentor - Una herramienta educativa para orientación vocacional</p>
         </footer>
       </div>
     </div>
