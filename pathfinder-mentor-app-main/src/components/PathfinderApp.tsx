@@ -94,7 +94,7 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
     <div className="app-background">
       <div className="container px-4 py-8 md:py-12 min-h-screen">
         <header className="w-full mx-auto flex flex-col items-center text-center mb-8 ">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Pathfinder Mentor</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Leo Mentor</h1>
           <p className="text-lg text-gray-600">Descubre tu carrera ideal a través de preguntas simples</p>
         </header>
         
