@@ -35,7 +35,7 @@ pregunta(1, c, ing_mecanica, 42).
 pregunta(1, d, computacion, 65).
 % pregunta(1, e, historia_humanidades, 58).
 pregunta(1, f, historia_humanidades, 58).
-pregunta(1, g, arte/diseno, 58).
+pregunta(1, g, arte_diseno, 58).
 
 pregunta(2, a, matematicas, 54).
 pregunta(2, b, biologia, 55).
@@ -45,7 +45,7 @@ pregunta(2, c, ing_electronica, 49).
 pregunta(2, d, computacion, 65).
 % pregunta(2, e, historia_humanidades, 58).
 pregunta(2, f, historia_humanidades, 58).
-pregunta(2, g, arte/diseno, 58).
+pregunta(2, g, arte_diseno, 58).
 
 pregunta(3, a, computacion, 65).
 pregunta(3, b, medicina, 54).
