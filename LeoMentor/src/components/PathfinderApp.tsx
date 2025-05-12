@@ -128,22 +128,19 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
         </header>
         
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-12">
-          <MentorCharacter 
-            className=""
-          />
-          <div className="flex flex-col items-center">
-            {/* Cuadro blanco de resultados */}
-            {!isComplete ? (
-              questionsToShow[currentQuestionIndex] ? (
-                <QuestionScreen 
-                  question={questionsToShow[currentQuestionIndex]}
-                  onSelectOption={handleSelectOption}
-                  isLastQuestion={currentQuestionIndex === questionsToShow.length - 1}
-                />
-              ) : (
-                <div className="text-red-500 font-bold text-center">No hay preguntas para mostrar.</div>
-              )
+          <MentorCharacter className="" />
+          {!isComplete ? (
+            questionsToShow[currentQuestionIndex] ? (
+              <QuestionScreen 
+                question={questionsToShow[currentQuestionIndex]}
+                onSelectOption={handleSelectOption}
+                isLastQuestion={currentQuestionIndex === questionsToShow.length - 1}
+              />
             ) : (
+              <div className="text-red-500 font-bold text-center">No hay preguntas para mostrar.</div>
+            )
+          ) : (
+            <div className="flex flex-col items-center">
               <div className="bg-white p-6 rounded-2xl shadow-lg border border-purple-100 max-w-3xl animate-fade-in mb-6">
                 <h2 className="text-2xl font-bold text-mentor-primary mb-4">¡Análisis completado!</h2>
                 {carreraMasAfin ? (
@@ -172,39 +169,35 @@ const PathfinderApp: React.FC<PathfinderAppProps> = ({ questionCount, questions 
                   Comenzar de nuevo
                 </button>
               </div>
-            )}
-            {/* Botones debajo del cuadro blanco */}
-            {isComplete && (
-              <>
-                <div className="flex justify-center gap-8 mt-0 mb-4 animate-fade-in">
-                  <button
-                    className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors"
-                    onClick={() => setOpenModal(true)}
-                  >
-                    Plan de estudios
-                  </button>
-                  <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
-                    Más Detalles
-                  </button>
-                </div>
-                {/* Modal para mostrar el PDF */}
-                <Dialog open={openModal} onOpenChange={setOpenModal}>
-                  <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col">
-                    <DialogTitle>Malla curricular de {carreraMasAfin}</DialogTitle>
-                    {carreraMasAfin && pdfLinks[carreraMasAfin.toLowerCase()] ? (
-                      <iframe
-                        src={pdfLinks[carreraMasAfin.toLowerCase()]}
-                        title={`Malla curricular de ${carreraMasAfin}`}
-                        className="w-full h-full rounded-lg border"
-                      />
-                    ) : (
-                      <div className="text-center text-red-500 py-8">No hay malla curricular disponible para esta carrera.</div>
-                    )}
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
-          </div>
+              {/* Botones debajo del cuadro blanco, alineados con el cuadro */}
+              <div className="flex justify-center gap-8 mt-0 mb-4 animate-fade-in">
+                <button
+                  className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors"
+                  onClick={() => setOpenModal(true)}
+                >
+                  Plan de estudios
+                </button>
+                <button className="bg-white text-mentor-primary font-semibold text-lg px-8 py-4 rounded-xl shadow border border-purple-100 hover:bg-indigo-50 transition-colors">
+                  Más Detalles
+                </button>
+              </div>
+              {/* Modal para mostrar el PDF */}
+              <Dialog open={openModal} onOpenChange={setOpenModal}>
+                <DialogContent className="max-w-4xl w-full h-[80vh] flex flex-col">
+                  <DialogTitle>Malla curricular de {carreraMasAfin}</DialogTitle>
+                  {carreraMasAfin && pdfLinks[carreraMasAfin.toLowerCase()] ? (
+                    <iframe
+                      src={pdfLinks[carreraMasAfin.toLowerCase()]}
+                      title={`Malla curricular de ${carreraMasAfin}`}
+                      className="w-full h-full rounded-lg border"
+                    />
+                  ) : (
+                    <div className="text-center text-red-500 py-8">No hay malla curricular disponible para esta carrera.</div>
+                  )}
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
         </div>
         
         <footer className="text-center text-gray-500 text-sm mt-30 mb-4">
